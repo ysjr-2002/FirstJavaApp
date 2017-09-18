@@ -10,15 +10,88 @@
 
     <TextView
         android:id="@+id/textview_info"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Hello World!"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"
        />
 
     <Button
         android:id="@+id/button_create"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="复制文件" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="创建目录A" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="创建目录B" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="复制文件" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="100dp"
+            android:text="编号:"
+            android:gravity="right"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:id="@+id/edittext_key"
+            android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/button_db_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="clear" />
+
+        <Button
+            android:id="@+id/button_db_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="count" />
+
+        <Button
+            android:id="@+id/button_db_insert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="insert" />
+
+        <Button
+            android:id="@+id/button_db_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="search" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_excel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="导入" />
 
 </android.widget.LinearLayout>
