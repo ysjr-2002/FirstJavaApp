@@ -1,14 +1,23 @@
 package com.myjava;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.*;
@@ -18,6 +27,8 @@ import com.mydata.Runner;
 import com.mydata.RunnerDBManager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -38,10 +49,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button button_db_search;
     Button button_excel;
     EditText editText_key;
+    ImageView imageView_face;
 
     String root = "";
 
     final String TAG = "YSJ";
+
+    private KeyReceiver keyReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +65,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initView();
 
         root = Environment.getExternalStorageDirectory().getPath();
+
+        keyReceiver = new KeyReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("android.rfid.FUN_KEY");
+        this.registerReceiver(keyReceiver, intentFilter);
     }
 
     private void showtoast(String info) {
@@ -68,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button_db_search = (Button) findViewById(R.id.button_db_search);
         button_excel = (Button) findViewById(R.id.button_excel);
         editText_key = (EditText) findViewById(R.id.edittext_key);
+
+        imageView_face = (ImageView) findViewById(R.id.imageView_face);
         button_create.setOnClickListener(this);
         buttona.setOnClickListener(this);
         buttonb.setOnClickListener(this);
@@ -97,6 +118,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.button3:
                 final String source = "/download/ysj.jpg";
+                String aa = root + "//aa";
+                File aaFile = new File(aa);
+                if (aaFile.exists() == false) {
+                    aaFile.mkdir();
+                }
 //                String density = "/aa/ysj.jpg";
 //                fileCopy(source, density);
 
@@ -166,25 +192,96 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void imporexcel() {
 
-        String path = root +"/download/runner.xlsx";
+        //仅支持读取excel 97-2003
+        String path = root + "/download/runner.xls";
         try {
 
             Workbook book = Workbook.getWorkbook(new File(path));
-            Sheet sheet = book.getSheet(0);
-            int Rows = sheet.getRows();
+            final Sheet sheet = book.getSheet(0);
+            final int Rows = sheet.getRows();
             int Cols = sheet.getColumns();
-
             Log.d(TAG, "当前工作表的名字:" + sheet.getName());
             Log.d(TAG, "总行数:" + Rows + ", 总列数:" + Cols);
+
+            final int copymax = Rows - 1;
+
+            dialog = new ProgressDialog(this);
+            dialog.setTitle("数据导入");
+            dialog.setIcon(R.mipmap.ic_launcher_round);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setMax(copymax);
+            dialog.show();
+
+            final String source = "/download/ysj.jpg";
+            thread = new Thread() {
+                int step = 1;
+
+                @Override
+                public void run() {
+                    super.run();
+//                    while (step <= copymax) {
+//                        String key = Integer.toString(step);
+//                        String temp = "//aa//" + Integer.toString(step) + ".jpg";
+//                        fileCopy(source, temp);
+//                        Runner runner = new Runner();
+//                        runner.setName(key);
+//                        runner.setCode(key);
+//                        runner.setPhoto(temp);
+//                        runner.setConfirm(getCurrentDateTime());
+//                        insert(runner);
+//                        dialog.setProgress(step);
+//                        step++;
+//                        try {
+//                            Thread.sleep(0);
+//                        } catch (Exception ex) {
+//                        }
+//                    }
+
+                    try {
+                        for (int i = 1; i < Rows; i++) {
+
+                            String name = ReadData(sheet, i, 0);
+                            String code = ReadData(sheet, i, 1);
+                            String photo = ReadData(sheet, i, 2);
+                            Log.d(TAG, name + " " + code + " " + photo);
+
+                            String temp = "//aa//" + Integer.toString(i) + ".jpg";
+                            dialog.setProgress(i);
+                            Runner runner = new Runner();
+                            runner.setName(name);
+                            runner.setCode(code);
+                            runner.setPhoto(temp);
+                            runner.setConfirm(getCurrentDateTime());
+                            insert(runner);
+
+                            Thread.sleep(500);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    dialog.cancel();
+                }
+            };
+            thread.start();
+
 
         } catch (java.io.IOException ex) {
 
             ex.printStackTrace();
-        }
-        catch (jxl.read.biff.BiffException ex){
+        } catch (jxl.read.biff.BiffException ex) {
             ex.printStackTrace();
         }
+    }
 
+    public static String ReadData(Sheet excelSheet, int row, int col) {
+        try {
+            String CellData = "";
+            Cell cell = excelSheet.getRow(row)[col];
+            CellData = cell.getContents().toString();
+            return CellData;
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     private static boolean deleteDir(File dir) {
@@ -211,6 +308,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void search(String key) {
+        editText_key.clearFocus();
         Runner runner = RunnerDBManager.getInstance(this).getRunner(key);
         if (runner != null) {
             String name = runner.getName();
@@ -218,9 +316,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String photo = runner.getPhoto();
             String confirm = runner.getConfirm();
             String temp = String.format("name->%s, code->%s, photo->%s, confirm->%s", name, code, photo, confirm);
-            showtoast(temp);
+//            showtoast(temp);
+            String path = root + photo;
+            Bitmap bitmap = getLoacalBitmap(path);
+            imageView_face.setImageBitmap(bitmap);
         } else {
             showtoast("查询记录为空");
+        }
+    }
+
+    public static Bitmap getLoacalBitmap(String url) {
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            return BitmapFactory.decodeStream(fis);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -266,5 +377,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        Log.d(TAG, "shit->" + Integer.toString(keyCode));
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private class KeyReceiver extends BroadcastReceiver {
+        private String TAG = "KeyReceiver";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int keyCode = intent.getIntExtra("keyCode", 0);
+            boolean keyDown = intent.getBooleanExtra("keydown", false);
+//			Log.e("down", ""+keyDown);
+            if (keyDown) {
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_F1:
+                        showtoast("f1");
+                        break;
+                    case KeyEvent.KEYCODE_F2:
+                        showtoast("f2");
+                        break;
+                    case KeyEvent.KEYCODE_F3:
+                        showtoast("f3");
+                        break;
+                    case KeyEvent.KEYCODE_F5:
+                        showtoast("f5");
+                        break;
+                    case KeyEvent.KEYCODE_F4:
+                        showtoast("f6");
+                        break;
+                }
+            }
+        }
     }
 }
