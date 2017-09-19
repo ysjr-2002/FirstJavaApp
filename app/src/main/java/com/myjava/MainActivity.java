@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -373,10 +375,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showtoast("bb");
                 break;
             case R.id.cc:
-                showtoast("cc");
+                getVersion();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void getVersion() {
+        try {
+
+            PackageManager packageManager = this.getPackageManager();
+            PackageInfo packageInfo = packageManager.getPackageInfo(this.getPackageName(), 0);
+
+            String versionName = packageInfo.versionName;
+            showtoast("版本->" + versionName);
+
+        } catch (PackageManager.NameNotFoundException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -403,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         showtoast("f2");
                         break;
                     case KeyEvent.KEYCODE_F3:
+                        //手持按键
                         showtoast("f3");
                         break;
                     case KeyEvent.KEYCODE_F5:
