@@ -84,7 +84,6 @@ public class RunnerDBManager {
         }
     }
 
-
     public Runner getRunner(String key) {
 
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
@@ -97,9 +96,7 @@ public class RunnerDBManager {
                 String name = cursor.getString(cursor.getColumnIndex("name"));
                 String code = cursor.getString(cursor.getColumnIndex("code"));
                 String photo = cursor.getString(cursor.getColumnIndex("photo"));
-
-                int i = cursor.getColumnIndex("confirm");
-                String confirm = cursor.getString(i);
+                String confirm = cursor.getString(cursor.getColumnIndex("confirm"));
                 runner = new Runner();
                 runner.setName(name);
                 runner.setCode(code);
