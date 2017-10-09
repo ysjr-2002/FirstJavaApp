@@ -15,5 +15,16 @@
         android:background="#893400"
         android:textColor="@color/colorAccent"
         android:gravity="center"
+        android:maxLines="2"
         android:layout_height="46dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:maxLines="2"
+        android:layout_height="wrap_content" />
+
+    <ProgressBar
+        android:id="@id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>
