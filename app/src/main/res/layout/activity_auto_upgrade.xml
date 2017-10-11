@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.myjava.AutoUpgrade">
+
+    <Button
+        android:id="@+id/button_check"
+        android:layout_width="match_parent"
+        android:text="检测"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button_upgrade"
+        android:layout_width="match_parent"
+        android:text="自动升级"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button_ws"
+        android:layout_width="match_parent"
+        android:text="Websocket"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
