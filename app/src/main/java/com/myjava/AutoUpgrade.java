@@ -2,6 +2,7 @@ package com.myjava;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -13,26 +14,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
-import com.neovisionaries.ws.client.ThreadType;
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
-import com.neovisionaries.ws.client.WebSocketListener;
-import com.neovisionaries.ws.client.WebSocketState;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Exchanger;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -48,6 +44,14 @@ public class AutoUpgrade extends AppCompatActivity {
     static final int message_update = 6543;
     @Bind(R.id.button_ws)
     Button buttonWs;
+    @Bind(R.id.button_write)
+    Button buttonWrite;
+    @Bind(R.id.button_read)
+    Button buttonRead;
+    @Bind(R.id.edittext_write)
+    EditText edittextWrite;
+    @Bind(R.id.edittext_read)
+    EditText edittextRead;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +69,7 @@ public class AutoUpgrade extends AppCompatActivity {
     final String tag = "SHIT->";
     CheckVersionThread checkThread;
 
-    @OnClick({R.id.button_upgrade, R.id.button_check})
+    @OnClick({R.id.button_upgrade, R.id.button_check, R.id.button_ws, R.id.button_write, R.id.button_read})
     public void onViewClicked(View view) {
 
         if (view.getId() == R.id.button_upgrade) {
@@ -79,28 +83,59 @@ public class AutoUpgrade extends AppCompatActivity {
             checkThread = new CheckVersionThread();
             checkThread.start();
         }
+        if (view.getId() == R.id.button_ws) {
+
+            ConnectWS ws = new ConnectWS();
+            Thread my = new Thread(ws);
+            my.start();
+        }
+        if (view.getId() == R.id.button_write) {
+
+        }
+        if (view.getId() == R.id.button_read) {
+
+        }
+    }
+
+    private void writeFile() {
+
+        try {
+            FileOutputStream fs = openFileOutput("shit", Context.MODE_PRIVATE);
+            String str = "yangshaojie";
+            byte[] bufer = str.getBytes();
+            fs.write(bufer);
+            fs.close();
+
+        } catch (java.io.FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (java.io.IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void readFile() {
+        try {
+
+            FileInputStream fs = openFileInput("shit");
+
+        } catch (Exception ex) {
+
+        }
+    }
+
+    class ConnectWS implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                websocketTest();
+            } catch (Exception ex) {
+
+            }
+        }
     }
 
     MyHandler handler;
-
-    @OnClick(R.id.button_ws)
-    public void onViewClicked() {
-
-        Thread my = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    websocketTest();
-                } catch (java.lang.Exception ex) {
-
-                }
-            }
-        });
-        my.start();
-
-
-    }
 
     class CheckVersionThread extends Thread {
 
@@ -236,151 +271,37 @@ public class AutoUpgrade extends AppCompatActivity {
 
     private void websocketTest() throws Exception {
 
-        WebSocket ws = new WebSocketFactory().createSocket("ws://192.168.2.196:9872/android");
+        String url = "ws://192.168.2.196:9872/android";
+        URI uri = URI.create(url);
+
+        WebSocketClient ws = new WebSocketClient(uri) {
+            @Override
+            public void onOpen(ServerHandshake handshakedata) {
+
+                String open = "open";
+            }
+
+            @Override
+            public void onMessage(String message) {
+
+                String temp = message;
+            }
+
+            @Override
+            public void onClose(int code, String reason, boolean remote) {
+
+                Integer i = code;
+            }
+
+            @Override
+            public void onError(Exception ex) {
+
+                ex.printStackTrace();
+                ;
+            }
+        };
 
         ws.connect();
 
-        ws.addListener(new WebSocketListener() {
-            @Override
-            public void onStateChanged(WebSocket websocket, WebSocketState newState) throws Exception {
-
-            }
-
-            @Override
-            public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
-
-                showToast("open");
-            }
-
-            @Override
-            public void onConnectError(WebSocket websocket, WebSocketException cause) throws Exception {
-
-            }
-
-            @Override
-            public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
-
-            }
-
-            @Override
-            public void onFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onContinuationFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onTextFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onBinaryFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onCloseFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onPingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onPongFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onTextMessage(WebSocket websocket, String text) throws Exception {
-
-            }
-
-            @Override
-            public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception {
-
-            }
-
-            @Override
-            public void onSendingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onFrameSent(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onFrameUnsent(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onThreadCreated(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
-
-            }
-
-            @Override
-            public void onThreadStarted(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
-
-            }
-
-            @Override
-            public void onThreadStopping(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
-
-            }
-
-            @Override
-            public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
-
-            }
-
-            @Override
-            public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onMessageError(WebSocket websocket, WebSocketException cause, List<WebSocketFrame> frames) throws Exception {
-
-            }
-
-            @Override
-            public void onMessageDecompressionError(WebSocket websocket, WebSocketException cause, byte[] compressed) throws Exception {
-
-            }
-
-            @Override
-            public void onTextMessageError(WebSocket websocket, WebSocketException cause, byte[] data) throws Exception {
-
-            }
-
-            @Override
-            public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-
-            }
-
-            @Override
-            public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
-
-            }
-
-            @Override
-            public void handleCallbackError(WebSocket websocket, Throwable cause) throws Exception {
-
-            }
-
-            @Override
-            public void onSendingHandshake(WebSocket websocket, String requestLine, List<String[]> headers) throws Exception {
-
-            }
-        });
     }
 }
