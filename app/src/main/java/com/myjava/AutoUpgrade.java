@@ -118,7 +118,7 @@ public class AutoUpgrade extends AppCompatActivity {
 
             FileInputStream fs = openFileInput("shit");
             BufferedInputStream bis = new BufferedInputStream(fs);
-            bis.rea
+            
 
         } catch (Exception ex) {
 
