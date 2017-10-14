@@ -21,6 +21,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -105,7 +106,6 @@ public class AutoUpgrade extends AppCompatActivity {
             byte[] bufer = str.getBytes();
             fs.write(bufer);
             fs.close();
-
         } catch (java.io.FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (java.io.IOException ex) {
@@ -117,6 +117,8 @@ public class AutoUpgrade extends AppCompatActivity {
         try {
 
             FileInputStream fs = openFileInput("shit");
+            BufferedInputStream bis = new BufferedInputStream(fs);
+            bis.rea
 
         } catch (Exception ex) {
 
