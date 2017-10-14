@@ -5,11 +5,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.renderscript.Script;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,11 +23,11 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -54,6 +56,10 @@ public class AutoUpgrade extends AppCompatActivity {
     EditText edittextWrite;
     @Bind(R.id.edittext_read)
     EditText edittextRead;
+    @Bind(R.id.button_write_share)
+    Button buttonWriteShare;
+    @Bind(R.id.button_read_share)
+    Button buttonReadShare;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +77,7 @@ public class AutoUpgrade extends AppCompatActivity {
     final String tag = "SHIT->";
     CheckVersionThread checkThread;
 
-    @OnClick({R.id.button_upgrade, R.id.button_check, R.id.button_ws, R.id.button_write, R.id.button_read})
+    @OnClick({R.id.button_upgrade, R.id.button_check, R.id.button_ws, R.id.button_write, R.id.button_read,R.id.button_write_share, R.id.button_read_share})
     public void onViewClicked(View view) {
 
         if (view.getId() == R.id.button_upgrade) {
@@ -93,23 +99,48 @@ public class AutoUpgrade extends AppCompatActivity {
         }
         if (view.getId() == R.id.button_write) {
 
+            writeFile();
         }
         if (view.getId() == R.id.button_read) {
-
+            readFile();
         }
+
+        if (view.getId() == R.id.button_read_share) {
+
+            readShare();
+        }
+
+        if (view.getId() == R.id.button_write_share) {
+            writeShare( );
+        }
+    }
+
+    private void writeShare() {
+
+        SharedPreferences p = this.getSharedPreferences("shit", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = p.edit();
+        editor.putString("name", edittextWrite.getText().toString());
+        editor.putString("age", "37");
+        editor.commit();
+    }
+
+    private void readShare() {
+        SharedPreferences p = this.getSharedPreferences("shit", Context.MODE_PRIVATE);
+        String name = p.getString("name", "yangshaojie");
+        String age = p.getString("age", "32");
     }
 
     private void writeFile() {
 
         try {
             FileOutputStream fs = openFileOutput("shit", Context.MODE_PRIVATE);
-            String str = "yangshaojie";
+            String str = edittextWrite.getText().toString();
             byte[] bufer = str.getBytes();
             fs.write(bufer);
             fs.close();
-        } catch (java.io.FileNotFoundException ex) {
+        } catch (FileNotFoundException ex) {
             ex.printStackTrace();
-        } catch (java.io.IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -119,6 +150,18 @@ public class AutoUpgrade extends AppCompatActivity {
 
             FileInputStream fs = openFileInput("shit");
             BufferedInputStream bis = new BufferedInputStream(fs);
+
+            int len = 0;
+            byte[] buffer = new byte[1024];
+            StringBuilder sb = new StringBuilder();
+            while ((len = fs.read(buffer, 0, buffer.length)) != -1) {
+
+                String str = new String(buffer, 0, len);
+                sb.append(str);
+            }
+
+            String content = sb.toString();
+            edittextRead.setText(content);
 
         } catch (Exception ex) {
 

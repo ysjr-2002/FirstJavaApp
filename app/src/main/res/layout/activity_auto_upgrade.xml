@@ -32,14 +32,36 @@
 
         <Button
             android:id="@+id/button_write"
-            android:text="写"
+            android:text="写_FileOutputStream"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/button_read"
-            android:text="读"
+            android:text="读_FileInputStream"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/button_write_share"
+            android:text="写_ShareReference"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_read_share"
+            android:text="读_ShareReference"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
