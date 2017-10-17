@@ -14,7 +14,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent myIntent = new Intent(context,MyBroadReceiver.class  );
+        Intent myIntent = new Intent(context, MyBroadReceiverActivity.class);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(myIntent);
     }

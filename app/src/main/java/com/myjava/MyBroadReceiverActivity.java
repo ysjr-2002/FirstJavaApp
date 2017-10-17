@@ -19,7 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Handler;
 
-public class MyBroadReceiver extends AppCompatActivity {
+public class MyBroadReceiverActivity extends AppCompatActivity {
 
     NetworkChangeReceiver networkChangeReceiver;
 
