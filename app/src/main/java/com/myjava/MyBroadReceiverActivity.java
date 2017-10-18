@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +15,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.mydata.Person;
+
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +28,7 @@ public class MyBroadReceiverActivity extends AppCompatActivity {
     NetworkChangeReceiver networkChangeReceiver;
 
     Button button_send_broad;
+    Button button_local_broad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +59,6 @@ public class MyBroadReceiverActivity extends AppCompatActivity {
         button_send_broad.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
 
                 String s1 = "a";
                 String s2 = "a";
@@ -123,11 +127,38 @@ public class MyBroadReceiverActivity extends AppCompatActivity {
                         sendOrderedBroadcast(intent, null);
                     }
                 }, 5000);
+            }
+        });
+
+        localReceiver = new LocalReceiver();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("this.is.local");
+
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(localReceiver, intentFilter);
 
 
+        button_local_broad = (Button) findViewById(R.id.button_send_localbroad);
+        button_local_broad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent("this.is.local");
+                intent.putExtra("name", "杨林哲");
+
+                Person person = new Person();
+                person.Name = "ysj";
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("name", person);
+                intent.putExtra("bundle", bundle);
+                localBroadcastManager.sendBroadcast(intent);
             }
         });
     }
+
+    LocalBroadcastManager localBroadcastManager;
+    LocalReceiver localReceiver;
 
     @Override
     protected void onDestroy() {
@@ -137,6 +168,18 @@ public class MyBroadReceiverActivity extends AppCompatActivity {
 
     private void showtoast(String content) {
         Toast.makeText(this, content, Toast.LENGTH_SHORT).show();
+    }
+
+    class LocalReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String name = intent.getStringExtra("name");
+            Bundle bundle = intent.getBundleExtra("bundle");
+            Object temp = bundle.getSerializable("name");
+            Person person = (Person) temp;
+            Toast.makeText(context, "this is local broadcastreceiver->" + name + " " + person.Name, Toast.LENGTH_SHORT).show();
+        }
     }
 
     class NetworkChangeReceiver extends BroadcastReceiver {
@@ -155,5 +198,4 @@ public class MyBroadReceiverActivity extends AppCompatActivity {
             }
         }
     }
-
 }

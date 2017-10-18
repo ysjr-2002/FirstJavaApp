@@ -17,4 +17,10 @@
         android:layout_width="match_parent"
         android:text="send my broad"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/button_send_localbroad"
+        android:layout_width="match_parent"
+        android:text="send local broad"
+        android:layout_height="wrap_content" />
 </LinearLayout>

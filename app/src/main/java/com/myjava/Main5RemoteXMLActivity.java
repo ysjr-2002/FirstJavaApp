@@ -8,7 +8,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.mydata.HttpCallbackListener;
 import com.mydata.HttpUtil;
+import com.mydata.MyApplication;
 import com.mydata.WeatherResult;
 
 import org.json.JSONException;
@@ -47,8 +49,15 @@ public class Main5RemoteXMLActivity extends Activity {
         ButterKnife.bind(this);
     }
 
-    private void showToast(String content) {
-        Toast.makeText(this, content, Toast.LENGTH_SHORT).show();
+    private void showToast(final String content) {
+
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MyApplication.getContext(), content, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 
@@ -66,7 +75,18 @@ public class Main5RemoteXMLActivity extends Activity {
                 thread1.start();
                 break;
             case R.id.button_util:
-                HttpUtil.sendHttpRequest("");
+                HttpUtil.sendHttpRequest("http://www.baidu.com", new HttpCallbackListener() {
+
+                    @Override
+                    public void onFinished(String response) {
+                        showToast(response);
+                    }
+
+                    @Override
+                    public void onError(Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
                 break;
         }
     }
